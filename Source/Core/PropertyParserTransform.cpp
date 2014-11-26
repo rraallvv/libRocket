@@ -165,6 +165,8 @@ bool PropertyParserTransform::ParseValue(Property& property, const String& value
 
 	property.value = Variant(TransformRef(transform));
 	property.unit = Property::TRANSFORM;
+
+	return true;
 }
 
 // Destroys the parser.

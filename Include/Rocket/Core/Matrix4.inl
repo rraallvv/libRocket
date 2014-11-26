@@ -75,6 +75,7 @@ const typename Matrix4< Component, Storage >::ThisType& Matrix4< Component, Stor
 	{
 		vectors[i] = other.vectors[i];
 	}
+	return *this;
 }
 
 template< typename Component, class Storage >
