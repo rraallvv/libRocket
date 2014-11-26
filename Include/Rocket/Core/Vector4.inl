@@ -67,12 +67,12 @@ Type Vector4< Type >::SquaredMagnitude() const
 template < typename Type >
 Vector4< Type > Vector4< Type >::Normalise() const
 {
-	ROCKET_STATIC_ASSERT(false, Invalid_Operation);
-	return *this;
-}
+	float magnitude = Magnitude();
+	if (Math::IsZero(magnitude))
+		return *this;
 
-template <>
-ROCKETCORE_API Vector4< float > Vector4< float >::Normalise() const;
+	return *this / magnitude;
+}
 
 // Computes the dot-product between this vector and another.
 template < typename Type >
