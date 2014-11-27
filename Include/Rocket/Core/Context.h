@@ -296,7 +296,9 @@ private:
 	ElementSet drag_hover_chain;
 
 	// Input state; stored from the most recent input events we receive from the application.
-	Vector2i mouse_position;
+	Vector2i mouse_position, old_mouse_position;
+	int key_modifier_state;
+	bool mouse_moved;
 
 	// The render interface this context renders through.
 	RenderInterface* render_interface;

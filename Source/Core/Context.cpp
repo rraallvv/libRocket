@@ -148,6 +148,35 @@ const ViewState& Context::GetViewState() const throw()
 // Updates all elements in the element tree.
 bool Context::Update()
 {
+	// Generate the parameters for the mouse events (there could be a few!).
+	Dictionary parameters;
+	GenerateMouseEventParameters(parameters, -1);
+	GenerateKeyModifierEventParameters(parameters, key_modifier_state);
+
+	Dictionary drag_parameters;
+	GenerateMouseEventParameters(drag_parameters);
+	GenerateDragEventParameters(drag_parameters);
+	GenerateKeyModifierEventParameters(drag_parameters, key_modifier_state);
+
+	// Update the current hover chain. This will send all necessary 'onmouseout', 'onmouseover', 'ondragout' and
+	// 'ondragover' messages.
+	UpdateHoverChain(parameters, drag_parameters, old_mouse_position);
+
+	// Dispatch any 'onmousemove' events.
+	if (mouse_moved)
+	{
+		if (hover)
+		{
+			hover->DispatchEvent(MOUSEMOVE, parameters, true);
+
+			if (drag_hover &&
+				drag_verbose)
+				drag_hover->DispatchEvent(DRAGMOVE, drag_parameters, true);
+		}
+
+		mouse_moved = false;
+	}
+
 	root->Update();
 
 	// Release any documents that were unloaded during the update.
@@ -551,6 +580,8 @@ bool Context::ProcessKeyDown(Input::KeyIdentifier key_identifier, int key_modifi
 	GenerateKeyEventParameters(parameters, key_identifier);
 	GenerateKeyModifierEventParameters(parameters, key_modifier_state);
 
+	this->key_modifier_state = key_modifier_state;
+
 	if (focus)
 		return focus->DispatchEvent(KEYDOWN, parameters, true);
 	else
@@ -564,6 +595,8 @@ bool Context::ProcessKeyUp(Input::KeyIdentifier key_identifier, int key_modifier
 	Dictionary parameters;
 	GenerateKeyEventParameters(parameters, key_identifier);
 	GenerateKeyModifierEventParameters(parameters, key_modifier_state);
+
+	this->key_modifier_state = key_modifier_state;
 
 	if (focus)
 		return focus->DispatchEvent(KEYUP, parameters, true);
@@ -608,40 +641,15 @@ bool Context::ProcessTextInput(const String& string)
 void Context::ProcessMouseMove(int x, int y, int key_modifier_state)
 {
 	// Check whether the mouse moved since the last event came through.
-	Vector2i old_mouse_position = mouse_position;
-	bool mouse_moved = (x != mouse_position.x) || (y != mouse_position.y);
+	old_mouse_position = mouse_position;
+	mouse_moved = (x != mouse_position.x) || (y != mouse_position.y);
 	if (mouse_moved)
 	{
 		mouse_position.x = x;
 		mouse_position.y = y;
 	}
 
-	// Generate the parameters for the mouse events (there could be a few!).
-	Dictionary parameters;
-	GenerateMouseEventParameters(parameters, -1);
-	GenerateKeyModifierEventParameters(parameters, key_modifier_state);
-
-	Dictionary drag_parameters;
-	GenerateMouseEventParameters(drag_parameters);
-	GenerateDragEventParameters(drag_parameters);
-	GenerateKeyModifierEventParameters(drag_parameters, key_modifier_state);
-
-	// Update the current hover chain. This will send all necessary 'onmouseout', 'onmouseover', 'ondragout' and
-	// 'ondragover' messages.
-	UpdateHoverChain(parameters, drag_parameters, old_mouse_position);
-
-	// Dispatch any 'onmousemove' events.
-	if (mouse_moved)
-	{
-		if (hover)
-		{
-			hover->DispatchEvent(MOUSEMOVE, parameters, true);
-
-			if (drag_hover &&
-				drag_verbose)
-				drag_hover->DispatchEvent(DRAGMOVE, drag_parameters, true);
-		}
-	}
+	this->key_modifier_state = key_modifier_state;
 }
 	
 static Element* FindFocusElement(Element* element)
@@ -739,6 +747,8 @@ void Context::ProcessMouseButtonDown(int button_index, int key_modifier_state)
 		if (hover)
 			hover->DispatchEvent(MOUSEDOWN, parameters, true);
 	}
+
+	this->key_modifier_state = key_modifier_state;
 }
 
 // Sends a mouse-button up event into Rocket.
@@ -801,11 +811,15 @@ void Context::ProcessMouseButtonUp(int button_index, int key_modifier_state)
 		if (hover)
 			hover->DispatchEvent(MOUSEUP, parameters, true);
 	}
+
+	this->key_modifier_state = key_modifier_state;
 }
 
 // Sends a mouse-wheel movement event into Rocket.
 bool Context::ProcessMouseWheel(int wheel_delta, int key_modifier_state)
 {
+	this->key_modifier_state = key_modifier_state;
+
 	if (hover)
 	{
 		Dictionary scroll_parameters;
@@ -1217,6 +1231,8 @@ void Context::GenerateKeyModifierEventParameters(Dictionary& parameters, int key
 
 	for (int i = 0; i < 7; i++)
 		parameters.Set(property_names[i], (int) ((key_modifier_state & (1 << i)) > 0));
+
+	this->key_modifier_state = key_modifier_state;
 }
 
 // Builds the parameters for a drag event.
