@@ -36,6 +36,7 @@ ShellRenderInterfaceOpenGL::ShellRenderInterfaceOpenGL()
 	m_rocket_context = NULL;
 	m_width = 0;
 	m_height = 0;
+	m_transforms = 0;
 }
 
 // Called by Rocket when it wants to render geometry that it does not wish to optimise.
