@@ -1108,27 +1108,20 @@ float Element::GetScrollHeight()
 	return Math::Max(content_box.y, GetClientHeight());
 }
 
-/// Gets the value stored in the property opacity clamped to the interval [0..1].
-float Element::GetOpacity()
-{
-	float opacity = GetProperty(OPACITY)->Get<float>();
-	if (opacity < 0) opacity = 0;
-	if (opacity > 1) opacity = 1;
-	return opacity;
-}
-
 /// Gets the opacity multiplied by the parent's absolute opacity.
 float Element::GetAbsoluteOpacity()
 {
 	if (opacity_dirty)
 	{
-		float opacity = GetOpacity();
+		float opacity = style->GetOpacity();
+		if (opacity < 0) opacity = 0;
+		if (opacity > 1) opacity = 1;
 
 		// We need the parent's absolute opacity to calculate this element's absolute opacity.
 		if (parent)
 			opacity *= parent->GetAbsoluteOpacity();
 
-		this->absolute_opacity = opacity;
+		absolute_opacity = opacity;
 		opacity_dirty = false;
 	}
 

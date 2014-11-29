@@ -817,5 +817,11 @@ const Property *ElementStyle::GetTransformOriginZ()
 	return element->GetProperty(TRANSFORM_ORIGIN_Z);
 }
 
+// Returns 'opacity' property value from element's style or local cache.
+float ElementStyle::GetOpacity()
+{
+	return element->GetProperty(OPACITY)->Get<float>();
+}
+
 }
 }

@@ -455,9 +455,6 @@ public:
 	/// @return The height (in pixels) of the of the scrollable content of the element.
 	float GetScrollHeight();
 
-	/// Gets the value stored in the property opacity clamped to the interval [0..1].
-	/// @return This element's opacity.
-	float GetOpacity();
 	/// Gets the opacity multiplied by the parent's absolute opacity.
 	/// @return This element's absolute opacity.
 	float GetAbsoluteOpacity();

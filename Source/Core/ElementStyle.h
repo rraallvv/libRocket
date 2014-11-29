@@ -191,6 +191,9 @@ public:
 	/// Returns 'transform-origin-z' property value from element's style or local cache.
 	const Property *GetTransformOriginZ();
 
+	/// Returns 'opacity' property value from element's style or local cache.
+	float GetOpacity();
+
 	static PropCounter &GetPropCounter();
 
 private:
