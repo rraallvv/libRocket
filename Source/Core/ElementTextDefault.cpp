@@ -358,6 +358,13 @@ void ElementTextDefault::DirtyFont()
 	font_dirty = true;
 }
 
+/// Forces a re-generation of the text geometry because of the change in the opacity
+void ElementTextDefault::DirtyOpacity()
+{
+	Element::DirtyOpacity();
+	geometry_dirty = true;
+}
+
 // Updates the configuration this element uses for its font.
 bool ElementTextDefault::UpdateFontConfiguration()
 {
@@ -406,6 +413,11 @@ void ElementTextDefault::GenerateGeometry(FontFaceHandle* font_face_handle)
 
 void ElementTextDefault::GenerateGeometry(FontFaceHandle* font_face_handle, Line& line)
 {
+	float opacity = GetAbsoluteOpacity();
+
+	Colourb colour = this->colour;
+	colour.alpha = Rocket::Core::Math::Round(colour.alpha * opacity);
+
 	line.width = font_face_handle->GenerateString(geometry, line.text, line.position, colour, font_configuration);
 	for (size_t i = 0; i < geometry.size(); ++i)
 		geometry[i].SetHostElement(this);

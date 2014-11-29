@@ -88,6 +88,9 @@ protected:
 	/// @param[in] event The event to process.
 	virtual void ProcessEvent(Event& event);
 
+	/// Forces a re-generation of the image's geometry because of the change in the opacity
+	virtual void DirtyOpacity();
+
 private:
 	// Generates the element's geometry.
 	void GenerateGeometry();

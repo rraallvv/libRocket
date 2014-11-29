@@ -455,6 +455,13 @@ public:
 	/// @return The height (in pixels) of the of the scrollable content of the element.
 	float GetScrollHeight();
 
+	/// Gets the value stored in the property opacity clamped to the interval [0..1].
+	/// @return This element's opacity.
+	float GetOpacity();
+	/// Gets the opacity multiplied by the parent's absolute opacity.
+	/// @return This element's absolute opacity.
+	float GetAbsoluteOpacity();
+
 	/// Gets the object representing the declarations of an element's style attributes.
 	/// @return The element's style.
 	ElementStyle* GetStyle();
@@ -650,6 +657,9 @@ protected:
 	/// Forces a reevaluation of applicable font effects.
 	virtual void DirtyFont();
 
+	/// Forces a geometry re-generation for the element's background, borders, and decorators. Also brings an oportunity for a subclas to re-generate its custom geometry.
+	virtual void DirtyOpacity();
+
 	/// Returns the RML of this element and all children.
 	/// @param[out] content The content of this element and those under it, in XML form.
 	virtual void GetRML(String& content);
@@ -756,6 +766,10 @@ private:
 	bool transform_state_perspective_dirty;
 	bool transform_state_transform_dirty;
 	bool transform_state_parent_transform_dirty;
+
+	// This element's opacity multiplied by the parent's absolute opacity
+	float absolute_opacity;
+	bool opacity_dirty;
 
 	friend class Context;
 	friend class ElementStyle;

@@ -65,8 +65,12 @@ void ElementBackground::DirtyBackground()
 // Generates the background geometry for the element.
 void ElementBackground::GenerateBackground()
 {
+	float opacity = element->GetAbsoluteOpacity();
+
 	// Fetch the new colour for the background. If the colour is transparent, then we don't render any background.
 	Colourb colour = element->GetProperty(BACKGROUND_COLOR)->value.Get< Colourb >();
+	colour.alpha = Rocket::Core::Math::Round(colour.alpha * opacity);
+
 	if (colour.alpha <= 0)
 	{
 		geometry.GetVertices().clear();

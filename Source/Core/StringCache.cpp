@@ -101,6 +101,7 @@ const String TRANSFORM_ORIGIN = "transform-origin";
 const String TRANSFORM_ORIGIN_X = "transform-origin-x";
 const String TRANSFORM_ORIGIN_Y = "transform-origin-y";
 const String TRANSFORM_ORIGIN_Z = "transform-origin-z";
+const String OPACITY = "opacity";
 
 const String MOUSEDOWN = "mousedown";
 const String MOUSESCROLL = "mousescroll";

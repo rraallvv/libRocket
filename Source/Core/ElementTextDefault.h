@@ -86,6 +86,9 @@ protected:
 	/// Forces a reevaluation of applicable font effects.
 	virtual void DirtyFont();
 
+	/// Forces a re-generation of the text geometry because of the change in the opacity
+	virtual void DirtyOpacity();
+
 private:
 	// Updates the configuration this element uses for its font, depending on which font effects
 	// are active.

@@ -104,6 +104,7 @@ extern const String TRANSFORM_ORIGIN;
 extern const String TRANSFORM_ORIGIN_X;
 extern const String TRANSFORM_ORIGIN_Y;
 extern const String TRANSFORM_ORIGIN_Z;
+extern const String OPACITY;
 
 extern const String MOUSEDOWN;
 extern const String MOUSESCROLL;

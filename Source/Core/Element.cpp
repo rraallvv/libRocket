@@ -105,6 +105,9 @@ Element::Element(const String& _tag) : relative_offset_base(0, 0), relative_offs
 	clipping_enabled = false;
 	clipping_state_dirty = true;
 
+	absolute_opacity = 1.0;
+	opacity_dirty = false;
+
 	event_dispatcher = new EventDispatcher(this);
 	style = new ElementStyle(this);
 	background = new ElementBackground(this);
@@ -1105,6 +1108,33 @@ float Element::GetScrollHeight()
 	return Math::Max(content_box.y, GetClientHeight());
 }
 
+/// Gets the value stored in the property opacity clamped to the interval [0..1].
+float Element::GetOpacity()
+{
+	float opacity = GetProperty(OPACITY)->Get<float>();
+	if (opacity < 0) opacity = 0;
+	if (opacity > 1) opacity = 1;
+	return opacity;
+}
+
+/// Gets the opacity multiplied by the parent's absolute opacity.
+float Element::GetAbsoluteOpacity()
+{
+	if (opacity_dirty)
+	{
+		float opacity = GetOpacity();
+
+		// We need the parent's absolute opacity to calculate this element's absolute opacity.
+		if (parent)
+			opacity *= parent->GetAbsoluteOpacity();
+
+		this->absolute_opacity = opacity;
+		opacity_dirty = false;
+	}
+
+	return absolute_opacity;
+}
+
 // Gets the object representing the declarations of an element's style attributes.
 ElementStyle* Element::GetStyle()
 {
@@ -1884,6 +1914,11 @@ void Element::OnPropertyChange(const PropertyNameList& changed_properties)
 	{
 		DirtyTransformState(false, true, false);
 	}
+
+	// Check for `opacity' changes
+	if (all_dirty ||
+		changed_properties.find(OPACITY) != changed_properties.end())
+		DirtyOpacity();
 }
 
 // Called when a child node has been added somewhere in the hierarchy
@@ -2510,6 +2545,22 @@ void Element::UpdateTransformState()
 	{
 		transform_state.reset(0);
 	}
+}
+
+void Element::DirtyOpacity()
+{
+	background->DirtyBackground();
+	border->DirtyBorder();
+	decoration->ReloadDecorators();
+
+	//DirtyFont();
+
+	for (size_t i = 0; i < children.size(); ++i)
+	{
+		children[i]->DirtyOpacity();
+	}
+
+	opacity_dirty = true;
 }
 
 }

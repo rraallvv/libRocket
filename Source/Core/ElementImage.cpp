@@ -173,6 +173,14 @@ void ElementImage::GenerateGeometry()
 	// Release the old geometry before specifying the new vertices.
 	geometry.Release(true);
 
+	float opacity = GetAbsoluteOpacity();
+
+	if (opacity <= 0)
+		return;
+
+	Colourb colour = Colourb(255, 255, 255);
+	colour.alpha = Rocket::Core::Math::Round(colour.alpha * opacity);
+
 	std::vector< Rocket::Core::Vertex >& vertices = geometry.GetVertices();
 	std::vector< int >& indices = geometry.GetIndices();
 
@@ -205,7 +213,7 @@ void ElementImage::GenerateGeometry()
 												  &indices[0],									// indices to write to
 												  Vector2f(0, 0),					// origin of the quad
 												  GetBox().GetSize(Rocket::Core::Box::CONTENT),	// size of the quad
-												  Colourb(255, 255, 255, 255),		// colour of the vertices
+												  colour,		// colour of the vertices
 												  texcoords[0],									// top-left texture coordinate
 												  texcoords[1]);								// top-right texture coordinate
 
@@ -235,6 +243,13 @@ bool ElementImage::LoadTexture()
 	// Set the texture onto our geometry object.
 	geometry.SetTexture(&texture);
 	return true;
+}
+
+/// Forces a re-generation of the image's geometry because of the change in the opacity
+void ElementImage::DirtyOpacity()
+{
+	Element::DirtyOpacity();
+	geometry_dirty = true;
 }
 
 void ElementImage::ResetCoords()

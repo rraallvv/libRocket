@@ -107,6 +107,11 @@ Vector2f DecoratorTiled::Tile::GetDimensions(Element* element)
 // Generates geometry to render this tile across a surface.
 void DecoratorTiled::Tile::GenerateGeometry(std::vector< Vertex >& vertices, std::vector< int >& indices, Element* element, const Vector2f& surface_origin, const Vector2f& surface_dimensions, const Vector2f& tile_dimensions) const
 {
+	float opacity = element->GetAbsoluteOpacity();
+
+	if (opacity <= 0)
+		return;
+
 	RenderInterface* render_interface = element->GetRenderInterface();
 	TileDataMap::iterator data_iterator = data.find(render_interface);
 	if (data_iterator == data.end())
@@ -220,6 +225,9 @@ void DecoratorTiled::Tile::GenerateGeometry(std::vector< Vertex >& vertices, std
 				tile_texcoords[1].y = scaled_texcoords[1].y;
 		}
 
+		Colourb colour = Colourb(255, 255, 255);
+		colour.alpha = Rocket::Core::Math::Round(255.0 * opacity);
+
 		for (int x = 0; x < num_tiles[0]; x++)
 		{
 			// Squish the texture coordinates in the x if we're clamping and this is the last in a double-tile.
@@ -244,7 +252,7 @@ void DecoratorTiled::Tile::GenerateGeometry(std::vector< Vertex >& vertices, std
 			tile_position.x = surface_origin.x + (float) tile_dimensions.x * x;
 			tile_size.x = (float) (x < num_tiles[0] - 1 ? tile_dimensions.x : final_tile_dimensions.x);
 
-			GeometryUtilities::GenerateQuad(new_vertices, new_indices, tile_position, tile_size, Colourb(255, 255, 255), tile_texcoords[0], tile_texcoords[1], index_offset);
+			GeometryUtilities::GenerateQuad(new_vertices, new_indices, tile_position, tile_size, colour, tile_texcoords[0], tile_texcoords[1], index_offset);
 			new_vertices += 4;
 			new_indices += 6;
 			index_offset += 4;

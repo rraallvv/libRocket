@@ -289,6 +289,8 @@ void StyleSheetSpecification::RegisterDefaultProperties()
 	RegisterProperty(TRANSFORM_ORIGIN_Z, "0", false, false)
 		.AddParser("length");
 	RegisterShorthand(TRANSFORM_ORIGIN, "transform-origin-x, transform-origin-y, transform-origin-z");
+
+	RegisterProperty(OPACITY, "1.0", false, false).AddParser("number");
 }
 
 }
